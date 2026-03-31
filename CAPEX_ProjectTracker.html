@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CAPEX 2026 Project Tracker — Wisma 46</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--sf:#1a1d27;--sf2:#232736;--bd:#2d3248;--tw:#e8eaf0;--td:#8b90a5;--ac:#6366f1;--gn:#22c55e;--or:#f59e0b;--rd:#ef4444;--bl:#378ADD;--pu:#a855f7;--cy:#06b6d4}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tw)}
+.app{max-width:1440px;margin:0 auto;padding:16px 20px}
+.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd);padding-bottom:12px;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr .sub{color:var(--td);font-size:.72rem;margin-top:2px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;position:relative;overflow:hidden}
+.kpi .bar{position:absolute;top:0;left:0;right:0;height:3px}.kpi .lb{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--td);margin-bottom:4px}
+.kpi .vl{font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace}.kpi .su{font-size:.6rem;color:var(--td);margin-top:2px}
+.filt{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.filt h3{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--td);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.filt h3::before{content:'';display:inline-block;width:6px;height:6px;border-radius:2px;background:var(--ac)}
+.fg{display:flex;gap:16px;flex-wrap:wrap}.fg>div{flex:1;min-width:140px}.fg label{display:block;font-size:.6rem;font-weight:600;color:var(--td);margin-bottom:5px;text-transform:uppercase}
+.chips{display:flex;flex-wrap:wrap;gap:4px}.chip{padding:3px 9px;border-radius:6px;font-size:.64rem;font-weight:600;border:1px solid var(--bd);background:transparent;color:var(--td);cursor:pointer;transition:.2s;user-select:none}
+.chip:hover{border-color:var(--ac);color:var(--tw)}.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px}
+.cd h3{font-size:.72rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px}.cd h3 .d{width:6px;height:6px;border-radius:50%;display:inline-block}
+.cw{position:relative;width:100%;height:260px}
+table{width:100%;border-collapse:collapse;font-size:10px}th{padding:5px 7px;text-align:center;color:var(--tw);font-weight:700;background:var(--sf2);border:1px solid var(--bd);font-size:9px;white-space:nowrap;position:sticky;top:0}
+td{padding:4px 6px;border:1px solid var(--bd);font-size:10px;white-space:nowrap}.tbl-wrap{max-height:400px;overflow-y:auto;border-radius:8px;border:1px solid var(--bd)}
+.st{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700}.st-c{background:rgba(34,197,94,.15);color:var(--gn)}.st-p{background:rgba(55,138,221,.15);color:var(--bl)}
+.st-pr{background:rgba(245,158,11,.15);color:var(--or)}.st-o{background:rgba(139,144,165,.15);color:var(--td)}.st-d{background:rgba(239,68,68,.15);color:var(--rd)}
+.alert-ov{color:var(--rd);font-weight:700}.alert-ur{color:var(--or);font-weight:700}.alert-ok{color:var(--gn)}
+@media(max-width:800px){.g2{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr"><div><h1>CAPEX 2026 — PROJECT TRACKER</h1><div class="sub">Wisma 46 Kota BNI | PT Swadharma Primautama | Engineering</div></div></div>
+
+<div class="kpi-row" id="kpis"></div>
+
+<div class="filt"><h3>SLICER — Klik untuk filter</h3>
+<div class="fg">
+<div><label>Status</label><div class="chips" id="sl-st"></div></div>
+<div><label>Category</label><div class="chips" id="sl-cat"></div></div>
+</div></div>
+
+<div class="g2">
+<div class="cd"><h3><span class="d" style="background:var(--gn)"></span>Status Distribution</h3><div class="cw"><canvas id="c1"></canvas></div></div>
+<div class="cd"><h3><span class="d" style="background:var(--or)"></span>Project per Category</h3><div class="cw"><canvas id="c2"></canvas></div></div>
+</div>
+<div class="g2">
+<div class="cd"><h3><span class="d" style="background:var(--bl)"></span>Budget vs PO (Juta Rp)</h3><div class="cw"><canvas id="c3"></canvas></div></div>
+<div class="cd"><h3><span class="d" style="background:var(--pu)"></span>Completion Rate</h3><div class="cw"><canvas id="c4"></canvas></div></div>
+</div>
+
+<div class="cd" style="margin-bottom:12px"><h3><span class="d" style="background:var(--cy)"></span>Project Detail Table</h3>
+<div class="tbl-wrap"><table id="tbl"></table></div></div>
+</div>
+
+<script>
+const D=[{"cat": "Mech/Plumbing", "proj": "Replacement and or spare  of  Pump & Electromotor ", "scope": "Supply & Install Pekerjaan penggantain pompa Exspantion Cool", "contractor": "nan", "budget": 300000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "Mech/Plumbing", "proj": "Replacement of existing clean water main pipes fro", "scope": "Suply dan install project penggantian Pipa distribusi air be", "contractor": "PT Pilar Garba Inti", "budget": 800000000, "po": 18627845, "period": "27/08/2025-30/10/2025", "status": "Completed", "remarks": "PAID"}, {"cat": "Mech/Plumbing", "proj": "Replacement of existing clean water main pipes fro", "scope": "Supply & Install Disconecting Line Existing Pipa Distribusi ", "contractor": "PT Pilar Garba Inti", "budget": 800000000, "po": 485640, "period": "17/11/2025-30/11/2025", "status": "Completed", "remarks": "BAST-2"}, {"cat": "Mech/Plumbing", "proj": "Replacement of existing clean water main pipes fro", "scope": "Supply dan install  project penggantian Pipa distribusi air ", "contractor": "nan", "budget": 800000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "Mech/Plumbing", "proj": "Upgrade system monitoring  pompa plumbing ,drainag", "scope": "Supply & Install Project Upgrade system monitoring Water lev", "contractor": "PT Jaga Citra Inti", "budget": 100000000, "po": 39370725, "period": "05/01/2026-05/03/2026", "status": "In Progress", "remarks": "on progress"}, {"cat": "Mech/Plumbing", "proj": "New additional  water storage tank for rain water ", "scope": "Pekerjaan Supply & Install pemipaan untuk Water Tank Media w", "contractor": "PT Lamuri Indah Bersama", "budget": 150000000, "po": 986000, "period": "19/08/2025-30/08/2025", "status": "Completed", "remarks": "BAST-2"}, {"cat": "Mech/Plumbing", "proj": "New additional  water storage tank for rain water ", "scope": "Pekerjaan Supply & Install pemipaan untuk Water Tank  Media ", "contractor": "PT Lamuri Indah Bersama", "budget": 150000000, "po": 318000, "period": "19/08/2025-30/08/2025", "status": "Completed", "remarks": "BAST-2"}, {"cat": "Mech/Plumbing", "proj": "New additional  water storage tank for rain water ", "scope": "Suply dan instal project Pembuatan platform untuk new tank e", "contractor": "nan", "budget": 150000000, "po": 0, "period": "", "status": "Open", "remarks": "Process  PURCHASING"}, {"cat": "Electrical", "proj": "Upgrading components and rewiring sub DB and Start", "scope": "Upgrade  : Upgrade starting controller panel Pompa DWT Lt. 4", "contractor": "PT Panelindo mas", "budget": 300000000, "po": 7884000, "period": "02/06/2025-30/08/2025", "status": "Completed", "remarks": "BAST-2"}, {"cat": "Electrical", "proj": "Upgrading components and rewiring sub DB and Start", "scope": "Upgrading components and rewiring sub DB and Starting contro", "contractor": "nan", "budget": 300000000, "po": 0, "period": "", "status": "Open", "remarks": "Process  PURCHASING"}, {"cat": "Electrical", "proj": "Upgrading components and rewiring sub DB and Start", "scope": "Project upgrading Starting Controller Panel Boster pump Lt 4", "contractor": "nan", "budget": 300000000, "po": 0, "period": "", "status": "Open", "remarks": "Process  PURCHASING"}, {"cat": "Electrical", "proj": "Upgrading components and rewiring sub DB and Start", "scope": "Supply & Install Project upgrading Starting Controller Panel", "contractor": "nan", "budget": 300000000, "po": 0, "period": "", "status": "Open", "remarks": "Process  PURCHASING"}, {"cat": "Electrical", "proj": "New additional CCTV Camera system (IP Camera ) &up", "scope": "25/0678 : 95% Supply & Install Upgrade Camera Analog To IP L", "contractor": "PT Kanca Afaceri", "budget": 500000000, "po": 196853200, "period": "18/12/2025-31/01/2026", "status": "In Progress", "remarks": ""}, {"cat": "Electrical", "proj": "New additional CCTV Camera system (IP Camera ) &up", "scope": "5% Supply & Install New CCTV Camera Untuk Under Vehicle Surv", "contractor": "PT Kanca Afaceri", "budget": 500000000, "po": 2378700, "period": "", "status": "Completed", "remarks": "PAID"}, {"cat": "Electrical", "proj": "Additional Lighting decoration for building Façade", "scope": "50% payment design concept", "contractor": "nan", "budget": 500000000, "po": 0, "period": "", "status": "Open", "remarks": ""}, {"cat": "Electrical", "proj": "Additional Lighting decoration for building Façade", "scope": "Suply & Install New  LED lighting  untuk area  Façade tower ", "contractor": "nan", "budget": 500000000, "po": 0, "period": "", "status": "Open", "remarks": "Process  PURCHASING"}, {"cat": "Electrical", "proj": "Upgrading BAS main controller module ( NAE to SNE)", "scope": "Supply & Install Project Upgrading BAS Main Controller modul", "contractor": "PT Jaga Citra Inti", "budget": 320000000, "po": 304000000, "period": "120 hari", "status": "In Progress", "remarks": "Proses PO"}, {"cat": "Electrical", "proj": "Replacement of  conventional lighting to LED  ligh", "scope": "SUPPLY MATERIAL  Replacement of conventional lighting to LE", "contractor": "nan", "budget": 85000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "Electrical", "proj": "Replacement of panel charging for  battery LVSB", "scope": "Supply & Install Project penggantian Battery Charger Untuk A", "contractor": "PT Energitama Catudaya", "budget": 250000000, "po": 127500000, "period": "01/04/2026-30/08/2026", "status": "In Progress", "remarks": "Proses PO"}, {"cat": "ACMV", "proj": "Replacement of FCU  (construction ) + Direct purch", "scope": "25/0684 : 95% Supply & Install Penggantian Unit FCU No GF 26", "contractor": "PT BBS", "budget": 400000000, "po": 4379310, "period": "", "status": "Completed", "remarks": "PAID"}, {"cat": "ACMV", "proj": "Replacement of FCU  (construction ) + Direct purch", "scope": "24/0439 : 5% Supply Material FCU Merk Trane Untuk Lt 46,47 &", "contractor": "PT BBS", "budget": 400000000, "po": 0, "period": "", "status": "In Progress", "remarks": ""}, {"cat": "ACMV", "proj": "Replacement of chiller pump &motor (chilled water ", "scope": "5% Claiaim payment", "contractor": "nan", "budget": 1200000000, "po": 0, "period": "", "status": "Open", "remarks": ""}, {"cat": "ACMV", "proj": "Replacement of chiller pump &motor (chilled water ", "scope": "Suply & Install Project Penggantian pompa chiller no 5 Tahap", "contractor": "nan", "budget": 1200000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "ACMV", "proj": "Replacement of Cooling Tower unit  and or PVC Fill", "scope": "5% Payment", "contractor": "nan", "budget": 1800000000, "po": 0, "period": "", "status": "Open", "remarks": ""}, {"cat": "ACMV", "proj": "Replacement of Cooling Tower unit  and or PVC Fill", "scope": "5% Payment Supply & Install Project Penggantian Cooling Towe", "contractor": "nan", "budget": 1800000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "ACMV", "proj": "Energy saving mode for HVAC system -phase #2", "scope": "Additional work VO Plus", "contractor": "nan", "budget": 35000000, "po": 0, "period": "", "status": "Open", "remarks": ""}, {"cat": "ACMV", "proj": "Energy saving mode for HVAC system -phase #2", "scope": "Suply dan Install system Interface BAS untuk operation & con", "contractor": "PT Jaga Citra Inti", "budget": 35000000, "po": 0, "period": "16/09/2025-30/10/2025", "status": "In Progress", "remarks": ""}, {"cat": "ACMV", "proj": "Automatic ball cleaning system for tube  condenser", "scope": "95% payment ( Paid 2025)", "contractor": "nan", "budget": 350000000, "po": 0, "period": "", "status": "Open", "remarks": ""}, {"cat": "ACMV", "proj": "Replacement of  AHU motor & mechanical parts for f", "scope": "5% Payment Suply dan install project upgrade Motor dan Beari", "contractor": "PT Unitrindo", "budget": 400000000, "po": 0, "period": "27/09/2025-30/11/2025", "status": "In Progress", "remarks": ""}, {"cat": "Lift/Escalator", "proj": "Energy saving mode for HVAC system -phase #3", "scope": "Material Modernization project of lift fujitec at wisma 46 (", "contractor": "PT Fujitec", "budget": 600000000, "po": 0, "period": "14/06/2022-\n15/03/2024", "status": "Completed", "remarks": "BAST RETENSI"}, {"cat": "Lift/Escalator", "proj": "Energy saving mode for HVAC system -phase #3", "scope": "#PHASE 7 (LIFT #19)", "contractor": "nan", "budget": 600000000, "po": 0, "period": "", "status": "Completed", "remarks": "BAST RETENSI"}, {"cat": "Lift/Escalator", "proj": "Energy saving mode for HVAC system -phase #3", "scope": "Jasa Modernization project of 19 unit lift fujitec at wisma ", "contractor": "PT Fujitec", "budget": 600000000, "po": 0, "period": "14/06/2022-\n15/03/2024", "status": "Completed", "remarks": "BAST RETENSI"}, {"cat": "Lift/Escalator", "proj": "Replacement of Wire ropes Lift ( mainrope/Compensa", "scope": "1MAIN ROPE 12 MM @ 185 METER X 7 1,00 SET Penggantian rope l", "contractor": "PT Fujitec", "budget": 2000000000, "po": 979359750, "period": "11/06/2025-30/06/2025", "status": "In Progress", "remarks": "Progress Tunggu MOS"}, {"cat": "Lift/Escalator", "proj": "Replacement of Wire ropes Lift ( mainrope/Compensa", "scope": "1.SPRING FOR ROPE SOCKET 12MM 1 30,00 BUA Penggantian lift n", "contractor": "PT Fujitec", "budget": 2000000000, "po": 144780000, "period": "11/06/2025-30/12/2025", "status": "Open", "remarks": "MOS"}, {"cat": "Lift/Escalator", "proj": "Replacement of Wire ropes Lift ( mainrope/Compensa", "scope": "1.SPRING FOR ROPE SOCKET 12MM 1 30,00 BUA Penggantian lift n", "contractor": "PT Fujitec", "budget": 2000000000, "po": 1678588714, "period": "01/04/2026-31/03/2027", "status": "In Progress", "remarks": "Progress Tunggu MOS"}, {"cat": "Lift/Escalator", "proj": "Replacement of Wire ropes Lift ( mainrope/Compensa", "scope": "Jasa instalasi & shipment cost untuk penggantian main rope d", "contractor": "PT Fujitec", "budget": 2000000000, "po": 53921400, "period": "01/04/2026-30/06/2027", "status": "In Progress", "remarks": ""}, {"cat": "Civil General", "proj": "Indoor Carpark  floor coating -phase # 3 -area par", "scope": "Suply & Instal Project Epoxy Coating Tahap 3 untuk Lantai B1", "contractor": "PT Adi Perkasa", "budget": 30000000, "po": 0, "period": "01/04/2025-29/08/2025", "status": "Completed", "remarks": "BAST-2"}, {"cat": "Civil M&E", "proj": "Upgrade wall & floor tile for coridoor toilets at ", "scope": "Supply & Instal Project Upgrading Koridor Keramik Toilet & R", "contractor": "PT Dewangga", "budget": 800000000, "po": 0, "period": "14/11/2025-12/01/2026", "status": "In Progress", "remarks": ""}, {"cat": "Civil M&E", "proj": "Upgrading Soft and Hard Landscape, Social Garden, ", "scope": "Jasa : Design Upgrading Soft and Hard Landscape, Social Gard", "contractor": "nan", "budget": 2500000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "Other", "proj": "Special and major  additional  or new equipment an", "scope": "Project Lactation Room di Lantai 2", "contractor": "nan", "budget": 100000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "Other", "proj": "Landlord Builder works ( Civil + MEP Works  ) for ", "scope": "Supply & Install Project Fitted Unit 20.11", "contractor": "PT Karya Graha", "budget": 1000000000, "po": 338000000, "period": "`6/08/2025-29/09/2025", "status": "Completed", "remarks": "BAST-1"}, {"cat": "Other", "proj": "Landlord Builder works ( Civil + MEP Works  ) for ", "scope": "project Instalasi MEP Pipa air bersih dan Drain Kitchen Pros", "contractor": "nan", "budget": 1000000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}, {"cat": "Other", "proj": "Landlord Builder works ( Civil + MEP Works  ) for ", "scope": "Design & Build Fitted Unit 32.09", "contractor": "nan", "budget": 1000000000, "po": 0, "period": "", "status": "PR Submitted", "remarks": ""}];
+const tt={backgroundColor:'#1a1d27',titleColor:'#e8eaf0',bodyColor:'#e8eaf0',borderColor:'#2d3248',borderWidth:1,cornerRadius:8,padding:8};
+let filters={status:null,cat:null};let charts={};
+
+const STATS=["Completed","In Progress","PR Submitted","Open","Cancelled","Delay"];
+const CATS=[...new Set(D.map(d=>d.cat))];
+const SC={"Completed":"st-c","In Progress":"st-p","PR Submitted":"st-pr","Open":"st-o","Cancelled":"st-d","Delay":"st-d"};
+
+function filtered(){return D.filter(d=>(!filters.status||d.status===filters.status)&&(!filters.cat||d.cat===filters.cat))}
+
+function buildSlicers(){
+mk('sl-st',STATS,'status');mk('sl-cat',CATS,'cat');
+}
+function mk(id,items,key){
+const el=document.getElementById(id);el.innerHTML='';
+const a=document.createElement('span');a.className='chip on';a.textContent='All';a.onclick=()=>{filters[key]=null;upAll()};el.appendChild(a);
+items.forEach(i=>{const c=document.createElement('span');c.className='chip';c.textContent=i;c.onclick=()=>{filters[key]=filters[key]===i?null:i;upAll()};el.appendChild(c)});
+}
+function upChips(){['status','cat'].forEach(k=>{const id='sl-'+(k==='status'?'st':k);document.getElementById(id).querySelectorAll('.chip').forEach(c=>{if(c.textContent==='All')c.classList.toggle('on',!filters[k]);else c.classList.toggle('on',filters[k]===c.textContent)})})}
+
+function upKPI(){
+const f=filtered();const t=f.length;const c=f.filter(d=>d.status==='Completed').length;
+const p=f.filter(d=>d.status==='In Progress').length;const o=f.filter(d=>d.status==='Open').length;
+const tb=f.reduce((a,d)=>a+d.budget,0);const tp=f.reduce((a,d)=>a+d.po,0);
+document.getElementById('kpis').innerHTML=[
+{l:'Total Project',v:t,s:'Semua project',c:'#6366f1'},{l:'Completed',v:c,s:t>0?(c/t*100).toFixed(0)+'% selesai':'0%',c:'#22c55e'},
+{l:'In Progress',v:p,s:'Sedang berjalan',c:'#378ADD'},{l:'Open/PR',v:t-c-p,s:'Belum mulai',c:'#f59e0b'},
+{l:'Budget (Rp)',v:(tb/1e9).toFixed(1)+'B',s:'Total budget',c:'#a855f7'},{l:'PO (Rp)',v:(tp/1e6).toFixed(0)+'M',s:tb>0?(tp/tb*100).toFixed(0)+'% absorbed':'',c:'#06b6d4'}
+].map(k=>`<div class="kpi"><div class="bar" style="background:${k.c}"></div><div class="lb">${k.l}</div><div class="vl" style="color:${k.c}">${k.v}</div><div class="su">${k.s}</div></div>`).join('');
+}
+
+function upCharts(){
+Object.values(charts).forEach(c=>c.destroy());charts={};const f=filtered();
+
+// Status donut
+const sc={};f.forEach(d=>sc[d.status]=(sc[d.status]||0)+1);
+const sLabels=Object.keys(sc),sData=Object.values(sc),sColors=sLabels.map(s=>({Completed:'#22c55e','In Progress':'#378ADD','PR Submitted':'#f59e0b',Open:'#8b90a5',Delay:'#ef4444',Cancelled:'#ef4444'})[s]||'#8b90a5');
+charts.c1=new Chart(document.getElementById('c1'),{type:'doughnut',data:{labels:sLabels,datasets:[{data:sData,backgroundColor:sColors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:tt}}});
+
+// Category bar
+const cc={};f.forEach(d=>cc[d.cat]=(cc[d.cat]||0)+1);
+const cLabels=Object.keys(cc),cData=Object.values(cc);
+const barColors=['#f59e0b','#378ADD','#06b6d4','#a855f7','#22c55e','#8b90a5','#6366f1'];
+charts.c2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:cLabels,datasets:[{data:cData,backgroundColor:cLabels.map((_,i)=>barColors[i%7]),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tt},scales:{x:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5'}},y:{grid:{display:false},ticks:{color:'#8b90a5',font:{size:9}}}}}});
+
+// Budget vs PO
+const bc={};f.forEach(d=>{if(!bc[d.cat])bc[d.cat]={b:0,p:0};bc[d.cat].b=d.budget/1e6;bc[d.cat].p+=d.po/1e6});
+const bLabels=Object.keys(bc);
+charts.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:bLabels,datasets:[{label:'Budget',data:bLabels.map(l=>Math.round(bc[l].b)),backgroundColor:'#f59e0b',borderRadius:3},{label:'PO',data:bLabels.map(l=>Math.round(bc[l].p)),backgroundColor:'#22c55e',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:tt},scales:{x:{grid:{display:false},ticks:{color:'#8b90a5',font:{size:8}}},y:{grid:{color:'#2d324855'},ticks:{color:'#8b90a5'}}}}});
+
+// Completion pie
+const comp=f.filter(d=>d.status==='Completed').length,rem=f.length-comp;
+charts.c4=new Chart(document.getElementById('c4'),{type:'pie',data:{labels:['Completed','Remaining'],datasets:[{data:[comp,rem],backgroundColor:['#22c55e','#2d3248'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a5',usePointStyle:true,font:{size:9}}},tooltip:tt}}});
+}
+
+function upTable(){
+const f=filtered();let h='<thead><tr><th>No</th><th>Category</th><th>Project</th><th>Scope</th><th>Contractor</th><th>Budget</th><th>PO</th><th>Status</th><th>Remarks</th></tr></thead><tbody>';
+f.forEach((d,i)=>{
+const scl=SC[d.status]||'st-o';
+h+=`<tr style="background:${i%2===0?'#1a1d27':'#0f1117'}"><td style="color:#8b90a5;text-align:center">${i+1}</td><td style="color:#8b90a5">${d.cat}</td><td style="color:#e8eaf0">${d.proj}</td><td style="color:#8b90a5">${d.scope}</td><td style="color:#06b6d4">${d.contractor||'—'}</td><td style="color:#f59e0b;text-align:right;font-family:'JetBrains Mono'">${d.budget>0?(d.budget/1e6).toFixed(0)+'M':'—'}</td><td style="color:#22c55e;text-align:right;font-family:'JetBrains Mono'">${d.po>0?(d.po/1e6).toFixed(0)+'M':'—'}</td><td><span class="st ${scl}">${d.status}</span></td><td style="color:#8b90a5">${d.remarks||'—'}</td></tr>`;
+});h+='</tbody>';document.getElementById('tbl').innerHTML=h;
+}
+
+function upAll(){upChips();upKPI();upCharts();upTable()}
+buildSlicers();upAll();
+</script>
+</body>
+</html>
